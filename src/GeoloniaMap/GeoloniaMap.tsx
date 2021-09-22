@@ -1,11 +1,51 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type geolonia from '@geolonia/embed';
 
+const camelCaseToSnakeCase = (input: string) => input.replace(/[A-Z]/g, (x) => '-' + x.toLowerCase());
+
+const EMBED_ATTRIBUTES = [
+  'lat',
+  'lng',
+  'zoom',
+  'bearing',
+  'pitch',
+  'hash',
+  'marker',
+  'markerColor',
+  'openPopup',
+  'customMarker',
+  'customMarkerOffset',
+  'gestureHandling',
+  'navigationControl',
+  'geolocateControl',
+  'fullscreenControl',
+  'scaleControl',
+  'geoloniaControl',
+  'geojson',
+  'cluster',
+  'clusterColor',
+  'style',
+  'lang',
+  'plugin',
+  'key',
+  'apiUrl',
+  'loader',
+  'minZoom',
+  'maxZoom',
+  '3d',
+] as const;
+type EmbedAttributeName = typeof EMBED_ATTRIBUTES[number];
+type EmbedAttributes = { [key in EmbedAttributeName]?: string };
+
 type GeoloniaMapProps = {
-  mapRef?: React.MutableRefObject<geolonia.Map>
-  style?: React.CSSProperties
-  embedSrc?: string
-}
+  className?: string;
+  style?: React.CSSProperties;
+  
+  mapRef?: React.MutableRefObject<geolonia.Map>;
+  embedSrc?: string;
+  apiKey?: string;
+  initOptions?: any; // Omit<geolonia.MapOptions, 'container'>;
+} & EmbedAttributes;
 
 const DEFAULT_EMBED_SRC = 'https://cdn.geolonia.com/v1/embed?geolonia-api-key=YOUR-API-KEY';
 
@@ -27,7 +67,7 @@ const findEmbedScriptTag = () => {
   return elem;
 };
 
-const ensureGeoloniaEmbed: (cb: () => void, embedSrc?: string) => false | typeof geolonia = (cb, embedSrc) => {
+const ensureGeoloniaEmbed: (cb: () => void, embedSrc?: string) => false | (typeof window.geolonia) = (cb, embedSrc) => {
   // If geolonia is already loaded, then just return that now.
   if ('geolonia' in window) return window.geolonia;
 
@@ -68,11 +108,20 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
     props.mapRef && (props.mapRef.current = map);
   }, [ reloadSwitch, props.embedSrc ]);
 
+  const dataAttributes = Object.fromEntries(EMBED_ATTRIBUTES.map((v) => {
+    if (typeof props[v] === 'undefined') return;
+    return ['data-' + camelCaseToSnakeCase(v), props[v]];
+  }).filter((v) => typeof v !== 'undefined'));
+
   return (
     <div
+      className={props.className}
       ref={mapContainer}
       style={props.style}
-    />
+      {...dataAttributes}
+    >
+      {props.children}
+    </div>
   );
 };
 
