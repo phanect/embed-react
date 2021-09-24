@@ -137,6 +137,7 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
       accessToken: props.apiKey,
     });
     props.mapRef && (props.mapRef.current = map);
+    props.onLoad && (props.onLoad(map));
   }, [ reloadSwitch, props ]);
 
   const dataAttributes = Object.fromEntries(EMBED_ATTRIBUTES.map((v) => {
