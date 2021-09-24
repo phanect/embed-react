@@ -1,6 +1,6 @@
 {
   "name": "@geolonia/embed-react",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "React bindings for Geolonia Maps Embed API",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
