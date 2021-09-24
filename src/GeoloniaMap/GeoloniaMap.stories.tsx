@@ -1,5 +1,6 @@
+import type { Map } from '@geolonia/embed';
 import { Meta } from '@storybook/react';
-import React from 'react';
+import React, { useCallback } from 'react';
 import GeoloniaMap from './GeoloniaMap';
 import './GeoloniaMap.stories.css';
 
@@ -90,3 +91,30 @@ export const Disable3D = () => (
     render3d="off"
   />
 );
+
+export const CustomJavaScript = () => {
+  const onLoad = useCallback((map: Map) => {
+    let animator: number | undefined = undefined;
+    const doRotate = () => {
+      map.rotateTo( map.getBearing() + 0.1 );
+      animator = window.requestAnimationFrame(doRotate);
+    };
+    doRotate();
+
+    return () => {
+      if (typeof animator !== 'undefined')
+        window.cancelAnimationFrame(animator);
+    };
+  }, []);
+  return (
+    <GeoloniaMap
+      className="geolonia"
+      mapStyle="geolonia/basic"
+      lat="35.68116"
+      lng="139.764992"
+      zoom="16"
+      render3d="on"
+      onLoad={onLoad}
+    />
+  );
+};
