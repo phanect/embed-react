@@ -1,12 +1,12 @@
 {
   "name": "@geolonia/embed-react",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "React bindings for Geolonia Maps Embed API",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist/**/*"
   ],
   "repository": "https://github.com/geolonia/embed-react",
   "author": "Keitaroh Kobayashi <k.kobayashi@geolonia.com>",
