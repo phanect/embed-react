@@ -16,8 +16,7 @@
     "build": "rollup -c",
     "lint": "eslint --ext .tsx --ext .ts --ext .jsx --ext .js src",
     "storybook": "start-storybook -p 6006",
-    "storybook:export": "build-storybook",
-    "prepublishOnly": "yarn build"
+    "storybook:export": "build-storybook"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
