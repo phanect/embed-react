@@ -1,10 +1,10 @@
 import { Meta } from '@storybook/react';
-import React from "react";
-import GeoloniaMap from "./GeoloniaMap";
+import React from 'react';
+import GeoloniaMap from './GeoloniaMap';
 import './GeoloniaMap.stories.css';
 
 export default {
-  title: "GeoloniaMap",
+  title: 'GeoloniaMap',
 } as Meta;
 
 export const Defaults = () => (
@@ -22,7 +22,7 @@ export const Marker = () => (
     zoom="16"
     markerColor="#555"
   />
-)
+);
 
 export const MarkerWithPopup = () => (
   <GeoloniaMap
@@ -33,7 +33,7 @@ export const MarkerWithPopup = () => (
   >
     <h3>Hello World!</h3>
   </GeoloniaMap>
-)
+);
 
 export const AllControls = () => (
   <GeoloniaMap
@@ -48,7 +48,7 @@ export const AllControls = () => (
   >
     グランフロント
   </GeoloniaMap>
-)
+);
 
 export const GeoJSONWithSimpleStyle = () => (
   <GeoloniaMap
@@ -59,7 +59,7 @@ export const GeoJSONWithSimpleStyle = () => (
     geojson="https://raw.githubusercontent.com/wakayama-pref-org/list-of-public-facilities/master/JSON/list-of-public-facilities.geojson"
     marker="off"
   />
-)
+);
 
 export const VectorTileWithSimpleStyle = () => (
   <GeoloniaMap
@@ -67,7 +67,7 @@ export const VectorTileWithSimpleStyle = () => (
     simpleVector="https://tileserver.geolonia.com/embed-simple-vector-sample/tiles.json"
     marker="off"
   />
-)
+);
 
 export const Enable3D = () => (
   <GeoloniaMap
@@ -78,7 +78,7 @@ export const Enable3D = () => (
     zoom="16"
     render3d="on"
   />
-)
+);
 
 export const Disable3D = () => (
   <GeoloniaMap
@@ -89,4 +89,4 @@ export const Disable3D = () => (
     zoom="16"
     render3d="off"
   />
-)
+);

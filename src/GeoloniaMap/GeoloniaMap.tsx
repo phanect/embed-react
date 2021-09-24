@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type geolonia from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
 
-const camelCaseToSnakeCase = (input: string) => input.replace(/[A-Z]/g, (x) => '-' + x.toLowerCase());
+const camelCaseToSnakeCase = (input: string) => input.replace(/[A-Z]/g, (x) => `-${x.toLowerCase()}`);
 
 const EMBED_ATTRIBUTES = [
   'render3d',
@@ -105,7 +105,7 @@ const ensureGeoloniaEmbed: (
   // If we can find the embed script tag, run the callback when it's done loading.
   const embedScriptTag = findEmbedScriptTag();
   if (embedScriptTag) {
-    embedScriptTag.addEventListener('load', () => { cb() });
+    embedScriptTag.addEventListener('load', () => { cb(); });
     return false;
   }
 
@@ -140,13 +140,13 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
   }, [ reloadSwitch, props ]);
 
   const dataAttributes = Object.fromEntries(EMBED_ATTRIBUTES.map((v) => {
-    if (typeof props[v] === 'undefined') return;
+    if (typeof props[v] === 'undefined') return undefined;
     let dataAttributeName: string = v;
     if (v in EMBED_ATTRIBUTE_MAP) {
       dataAttributeName = EMBED_ATTRIBUTE_MAP[v];
     }
     dataAttributeName = camelCaseToSnakeCase(dataAttributeName);
-    return ['data-' + dataAttributeName, props[v]];
+    return [`data-${dataAttributeName}`, props[v]];
   }).filter((v) => typeof v !== 'undefined'));
 
   return (

@@ -1,4 +1,4 @@
-import GeoloniaMap from "./GeoloniaMap/GeoloniaMap";
+import GeoloniaMap from './GeoloniaMap/GeoloniaMap';
 
 export {
   GeoloniaMap,
