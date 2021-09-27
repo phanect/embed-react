@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type geolonia from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
 
@@ -135,7 +135,6 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
 
     const map = new geolonia.Map({
       container: mapContainer.current,
-      // accessToken: initialProps.apiKey,
     });
     initialProps.mapRef && (initialProps.mapRef.current = map);
     initialProps.onLoad && (initialProps.onLoad(map));
