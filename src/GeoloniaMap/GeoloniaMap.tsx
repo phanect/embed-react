@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type geolonia from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
 
@@ -123,10 +123,11 @@ const ensureGeoloniaEmbed: (
 const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
   const [ reloadSwitch, setReloadSwitch ] = useState(0);
   const mapContainer = useRef<HTMLDivElement>(null);
+  const [initialProps] = useState(props);
 
   useEffect(() => {
     const loaded = () => setReloadSwitch((sw) => sw + 1);
-    const geolonia = ensureGeoloniaEmbed(loaded, props.apiKey, props.embedSrc);
+    const geolonia = ensureGeoloniaEmbed(loaded, initialProps.apiKey, initialProps.embedSrc);
     if (!geolonia) {
       // Geolonia Embed API is not loaded yet, so we'll wait for it to load.
       return;
@@ -134,11 +135,15 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
 
     const map = new geolonia.Map({
       container: mapContainer.current,
-      accessToken: props.apiKey,
+      // accessToken: initialProps.apiKey,
     });
-    props.mapRef && (props.mapRef.current = map);
-    props.onLoad && (props.onLoad(map));
-  }, [ reloadSwitch, props ]);
+    initialProps.mapRef && (initialProps.mapRef.current = map);
+    initialProps.onLoad && (initialProps.onLoad(map));
+
+    return () => {
+      map.remove();
+    };
+  }, [ reloadSwitch, initialProps ]);
 
   const dataAttributes = Object.fromEntries(EMBED_ATTRIBUTES.map((v) => {
     if (typeof props[v] === 'undefined') return undefined;
