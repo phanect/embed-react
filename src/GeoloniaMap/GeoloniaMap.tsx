@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 import type geolonia from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
 
@@ -120,10 +121,65 @@ const ensureGeoloniaEmbed: (
   return false;
 };
 
-const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
+type MapMarkerPortalProps = {
+  map: geolonia.Map
+  lat: number
+  lng: number
+
+  markerColor: string
+  openPopup: string
+}
+
+// TODO: Expose this so users can set multiple markers.
+const MapMarkerPortal: React.FC<MapMarkerPortalProps> = (props) => {
+  const wrapperElement = useMemo(() => document.createElement('div'), []);
+  const { map, lat, lng, markerColor, openPopup } = props;
+
+  const popupExists = !!props.children;
+
+  useLayoutEffect(() => {
+    const marker = new window.geolonia.Marker({ color: markerColor })
+      .setLngLat([ lng, lat ])
+      .addTo(map);
+
+    if (popupExists) {
+      const popup = new (window.geolonia as unknown as typeof maplibregl).Popup({ offset: [0, -25] })
+        .setDOMContent(wrapperElement);
+      marker.setPopup(popup);
+      if (openPopup === 'on') {
+        marker.togglePopup();
+      }
+    }
+
+    return () => {
+      marker.remove();
+    };
+  }, [lat, lng, map, markerColor, openPopup, popupExists, wrapperElement]);
+
+  if (popupExists) {
+    return ReactDOM.createPortal(
+      props.children,
+      wrapperElement,
+    );
+  } else {
+    return null;
+  }
+};
+
+const GeoloniaMap: React.FC<GeoloniaMapProps> = (rawProps) => {
+  const props: React.PropsWithChildren<GeoloniaMapProps> = {
+    hash: 'off',
+    marker: 'on',
+    markerColor: '#E4402F',
+    openPopup: 'off',
+    mapStyle: 'geolonia/basic',
+    ...rawProps,
+  };
   const [ reloadSwitch, setReloadSwitch ] = useState(0);
+  const [ internalMap, setInternalMap ] = useState<geolonia.Map | undefined>(undefined);
+  const mapRef = useRef<geolonia.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
-  const [initialProps] = useState(props);
+  const [ initialProps ] = useState(props);
 
   useEffect(() => {
     const loaded = () => setReloadSwitch((sw) => sw + 1);
@@ -136,6 +192,8 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
     const map = new geolonia.Map({
       container: mapContainer.current,
     });
+    mapRef.current = map;
+    setInternalMap(map);
     initialProps.mapRef && (initialProps.mapRef.current = map);
     initialProps.onLoad && (initialProps.onLoad(map));
 
@@ -144,26 +202,75 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> = (props) => {
     };
   }, [ reloadSwitch, initialProps ]);
 
+  const currentPosRef = useRef({ lat: initialProps.lat, lng: initialProps.lng, zoom: initialProps.zoom });
+  useEffect(() => {
+    const { lat, lng, zoom } = currentPosRef.current;
+    if (lat === props.lat && lng === props.lng && zoom === props.zoom) {
+      // Nothing has changed from the current state.
+      return;
+    }
+
+    if (mapRef.current) {
+      mapRef.current.flyTo({
+        zoom: parseFloat(props.zoom),
+        center: {
+          lat: parseFloat(props.lat),
+          lng: parseFloat(props.lng),
+        },
+      });
+      currentPosRef.current = {
+        lat: props.lat,
+        lng: props.lng,
+        zoom: props.zoom,
+      };
+    }
+  }, [props.lat, props.lng, props.zoom]);
+
+  const currentStyleRef = useRef<string | undefined>(props.mapStyle);
+  useEffect(() => {
+    if (props.mapStyle === currentStyleRef.current) return;
+
+    if (mapRef.current) {
+      mapRef.current.setStyle(props.mapStyle);
+      currentStyleRef.current = props.mapStyle;
+    }
+  }, [props.mapStyle]);
+
+  const passthroughAttributes = {
+    ...initialProps,
+    // We are using our own marker implementation.
+    marker: 'off',
+  };
+
   const dataAttributes = Object.fromEntries(EMBED_ATTRIBUTES.map((v) => {
-    if (typeof props[v] === 'undefined') return undefined;
+    if (typeof passthroughAttributes[v] === 'undefined') return undefined;
     let dataAttributeName: string = v;
     if (v in EMBED_ATTRIBUTE_MAP) {
       dataAttributeName = EMBED_ATTRIBUTE_MAP[v];
     }
     dataAttributeName = camelCaseToSnakeCase(dataAttributeName);
-    return [`data-${dataAttributeName}`, props[v]];
+    return [`data-${dataAttributeName}`, passthroughAttributes[v]];
   }).filter((v) => typeof v !== 'undefined'));
 
-  return (
+  return (<>
     <div
       className={props.className}
       ref={mapContainer}
       style={props.style}
       {...dataAttributes}
-    >
-      {props.children}
-    </div>
-  );
+    />
+    { internalMap && props.lat && props.lng && props.marker === 'on' &&
+      <MapMarkerPortal
+        map={internalMap}
+        lat={parseFloat(props.lat)}
+        lng={parseFloat(props.lng)}
+        markerColor={props.markerColor}
+        openPopup={props.openPopup}
+      >
+        {props.children}
+      </MapMarkerPortal>
+    }
+  </>);
 };
 
 export default GeoloniaMap;

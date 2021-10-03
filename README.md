@@ -41,8 +41,21 @@ Geolonia Maps をご自身のサイトに表示させるために API キーが�
 
 Embed API は `data-*` アトリビュートで引数を渡していますが、 React インテグレーションは `data-*` がありません。例えば、 `data-lat="35"` の代わりに、 `lat="35"` で指定してください。 `-` で別れている言葉があれば camelCase でつなげてください。(例： `data-navigation-control` が `navigationControl` になります)
 
+また、 React や JavaScript の制約上制限されている属性名が変わります。下記の表を参照しにしてください。
+
+| Embed API の属性 | Embed React の props 名 |
+| --------------- | ----------------------- |
+| `data-style="geolonia/basic"` | `mapStyle="geolonia/basic"` |
+| `data-3d="on"`  | `render3d="on"` |
+
 `embed-react` は使用するコンポーネントがマウントされる時に Embed API の JavaScript が読み込まれているかを確認し、読み込まれていない場合は動的に追加します。もしサイトのほとんどのページに Geolonia Maps 地図を埋め込む場合は、テンプレートの `index.html` に埋め込むことをおすすめします。[サンプルを確認する](https://github.com/geolonia/maps.geolonia.com/blob/4e431e466db71af7b4181129b3a8408ae91cd028/public/index.html#L26)
 
 ## 注意
 
-現在のバージョンでは、 `GeoloniaMap` の props が変わると地図の再レンダリングが行われます。ポップアップ内の情報や他の props を動的に受け付けることを今後開発予定です。
+現在のバージョンでは、 `GeoloniaMap` の props が変わると地図の再レンダリングが行われません。
+
+下記の props が変わる時に動的に変更を受け付けています。
+
+* `lat`, `lng`, `zoom`
+  * マーカーが表示されているときはマーカーの位置を変更し、地図の中央点を新しい `lat`, `lng`, `zoom` に飛びます。
+* `mapStyle`
