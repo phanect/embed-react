@@ -50,7 +50,7 @@ type GeoloniaMapProps = {
   style?: React.CSSProperties;
 
   /** The underlying Map object that is in charge of rendering. */
-  mapRef?: React.MutableRefObject<geolonia.Map>;
+  mapRef?: React.MutableRefObject<geolonia.Map | null>;
   /**
    * This callback is run after the Map has been instantiated. Use this callback
    * to perform custom initialization.
