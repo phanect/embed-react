@@ -1,6 +1,6 @@
 # Geolonia Maps Embed for React
 
-![npm](https://img.shields.io/npm/v/@geolonia/embed-react?style=flat-square) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/geolonia/embed-react/build?style=flat-square)
+[![npm](https://img.shields.io/npm/v/@geolonia/embed-react?style=flat-square)](https://www.npmjs.com/package/@geolonia/embed-react) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/geolonia/embed-react/build?style=flat-square)](https://github.com/geolonia/embed-react/actions/workflows/build.yml)
 
 [Geolonia Maps](https://geolonia.com/maps/) の地図を React のアプリケーションに埋め込むためのライブラリー。
 
