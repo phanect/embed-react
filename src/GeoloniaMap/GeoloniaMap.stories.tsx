@@ -245,3 +245,34 @@ export const CustomJavaScript = () => {
     />
   );
 };
+
+export const WithinComponent = () => {
+  const WrapperComponent: React.FC<{idx: number}> = ({idx}) => {
+    return (
+      <div>
+        <h3>Hello, map {idx}!</h3>
+        <GeoloniaMap
+          className="geolonia"
+          mapStyle="geolonia/basic"
+          lat="35.68116"
+          lng="139.764992"
+          zoom="16"
+          render3d="on"
+        />
+      </div>
+    );
+  };
+
+  const [sel, setSel] = useState<number>(0);
+
+  return (
+    <div>
+      <p>Currently displaying: {sel}</p>
+      <button onClick={() => setSel(0)}>Switch to 0</button>
+      <button onClick={() => setSel(1)}>Switch to 1</button>
+      <button onClick={() => setSel(2)}>Switch to 2</button>
+
+      <WrapperComponent idx={sel} />
+    </div>
+  );
+};

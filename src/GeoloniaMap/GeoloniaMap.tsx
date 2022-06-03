@@ -227,20 +227,22 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> & { Control: typeof Control } = (r
       return;
     }
 
-    if (mapRef.current) {
-      mapRef.current.flyTo({
-        zoom: parseFloat(props.zoom),
-        center: {
-          lat: parseFloat(props.lat),
-          lng: parseFloat(props.lng),
-        },
-      });
-      currentPosRef.current = {
-        lat: props.lat,
-        lng: props.lng,
-        zoom: props.zoom,
-      };
+    if (!mapRef.current) {
+      return;
     }
+
+    mapRef.current.flyTo({
+      zoom: parseFloat(props.zoom),
+      center: {
+        lat: parseFloat(props.lat),
+        lng: parseFloat(props.lng),
+      },
+    });
+    currentPosRef.current = {
+      lat: props.lat,
+      lng: props.lng,
+      zoom: props.zoom,
+    };
   }, [props.lat, props.lng, props.zoom]);
 
   const currentStyleRef = useRef<string | undefined>(props.mapStyle);
