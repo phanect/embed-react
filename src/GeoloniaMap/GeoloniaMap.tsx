@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, createCon
 import ReactDOM from 'react-dom';
 import type geolonia from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
+import deepEqual from 'deep-equal';
 import { Control } from './Control';
 
 const camelCaseToSnakeCase = (input: string) => input.replace(/[A-Z]/g, (x) => `-${x.toLowerCase()}`);
@@ -167,17 +168,32 @@ const MapMarkerPortal: React.FC<MapMarkerPortalProps> = (props) => {
   }
 };
 
+const _filterBoundProps: (props: React.PropsWithChildren<GeoloniaMapProps>) => React.PropsWithChildren<GeoloniaMapProps> = (props) => {
+  return {
+    ...props,
+    lat: undefined,
+    lng: undefined,
+    zoom: undefined,
+    style: undefined,
+    mapStyle: undefined,
+    className: undefined,
+    children: undefined,
+    openPopup: undefined,
+    markerColor: undefined,
+  };
+};
+
 export const GeoloniaMapContext = createContext<geolonia.Map | null>(null);
 
 const GeoloniaMap: React.FC<GeoloniaMapProps> & { Control: typeof Control } = (rawProps) => {
-  const props: React.PropsWithChildren<GeoloniaMapProps> = {
+  const props: React.PropsWithChildren<GeoloniaMapProps> = useMemo(() => ({
     hash: 'off',
     marker: 'on',
     markerColor: '#E4402F',
     openPopup: 'off',
     mapStyle: 'geolonia/basic',
     ...rawProps,
-  };
+  }), [rawProps]);
 
   // A <Control /> node will be portalized with its container HTMLElement.
   // Others will be passed as Popup contents.
@@ -196,9 +212,21 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> & { Control: typeof Control } = (r
   const [ internalMap, setInternalMap ] = useState<geolonia.Map | undefined>(undefined);
   const mapRef = useRef<geolonia.Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
-  const [ initialProps ] = useState(props);
+  const [ initialProps, setInitialProps ] = useState(props);
 
   useEffect(() => {
+    setInitialProps((ip) => {
+      const filteredProps = _filterBoundProps(props);
+      const filteredIp = _filterBoundProps(ip);
+      if (deepEqual(filteredIp, filteredProps)) {
+        return ip;
+      } else {
+        return props;
+      }
+    });
+  }, [props]);
+
+  useLayoutEffect(() => {
     const loaded = () => setReloadSwitch((sw) => sw + 1);
     const geolonia = ensureGeoloniaEmbed(loaded, initialProps.apiKey, initialProps.embedSrc);
     if (!geolonia) {
@@ -206,16 +234,25 @@ const GeoloniaMap: React.FC<GeoloniaMapProps> & { Control: typeof Control } = (r
       return;
     }
 
+    const container = mapContainer.current;
     const map = new geolonia.Map({
-      container: mapContainer.current,
+      container,
     });
     mapRef.current = map;
     setInternalMap(map);
     initialProps.mapRef && (initialProps.mapRef.current = map);
     initialProps.onLoad && (initialProps.onLoad(map));
 
+    let fullyLoaded = false;
+    map.on('load', () => {
+      fullyLoaded = true;
+    });
+
     return () => {
-      map.remove();
+      if (fullyLoaded) {
+        map.remove();
+      }
+      (container as any).geoloniaMap = undefined;
     };
   }, [ reloadSwitch, initialProps ]);
 
