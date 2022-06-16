@@ -246,6 +246,27 @@ export const CustomJavaScript = () => {
   );
 };
 
+export const ChangeProps = () => {
+  const [onoff, setOnoff] = useState<string>('on');
+
+  return (
+    <div>
+      <p>Currently displaying: {onoff}</p>
+      <button onClick={() => setOnoff('on')}>Set render3d = on</button>
+      <button onClick={() => setOnoff('off')}>Set render3d = off</button>
+
+      <GeoloniaMap
+        className="geolonia"
+        mapStyle="geolonia/basic"
+        lat="35.68116"
+        lng="139.764992"
+        zoom="16"
+        render3d={onoff}
+      />
+    </div>
+  );
+};
+
 export const WithinComponent = () => {
   const WrapperComponent: React.FC<{idx: number}> = ({idx}) => {
     return (

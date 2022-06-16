@@ -28,6 +28,7 @@
     "@storybook/react": "^6.3.12",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.1.0",
+    "@types/deep-equal": "^1.0.1",
     "@types/jest": "^27.0.2",
     "@types/react": "^17.0.22",
     "@types/react-dom": "^17.0.9",
@@ -60,5 +61,8 @@
   "peerDependencies": {
     "react": ">=16.11.0",
     "react-dom": ">=16.11.0"
+  },
+  "dependencies": {
+    "deep-equal": "^2.0.5"
   }
 }
