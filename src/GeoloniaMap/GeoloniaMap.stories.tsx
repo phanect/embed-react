@@ -181,10 +181,7 @@ export const CustomControls = () => {
 export const GeoJSONWithSimpleStyle = () => (
   <GeoloniaMap
     className="geolonia"
-    lat="33.897"
-    lng="135.639"
-    zoom="10"
-    geojson="https://raw.githubusercontent.com/wakayama-pref-org/list-of-public-facilities/master/JSON/list-of-public-facilities.geojson"
+    geojson="https://gist.githubusercontent.com/miya0001/56c3dc174f5cdf1d9565cbca0fbd3c48/raw/c13330036d28ef547a8a87cb6df3fa12de19ddb6/test.geojson"
     marker="off"
   />
 );
