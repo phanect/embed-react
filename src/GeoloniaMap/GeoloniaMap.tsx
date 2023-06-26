@@ -191,7 +191,7 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
     marker: 'on',
     markerColor: '#E4402F',
     openPopup: 'off',
-    mapStyle: 'geolonia/basic',
+    mapStyle: 'geolonia/basic-v1',
     ...rawProps,
   }), [rawProps]);
 

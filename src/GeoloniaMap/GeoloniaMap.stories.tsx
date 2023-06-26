@@ -179,7 +179,7 @@ export const VectorTileWithSimpleStyle = () => (
 export const Enable3D = () => (
   <GeoloniaMap
     className="geolonia"
-    mapStyle="geolonia/basic"
+    mapStyle="geolonia/basic-v1"
     lat="35.68116"
     lng="139.764992"
     zoom="16"
@@ -215,7 +215,7 @@ export const CustomJavaScript = () => {
   return (
     <GeoloniaMap
       className="geolonia"
-      mapStyle="geolonia/basic"
+      mapStyle="geolonia/basic-v1"
       lat="35.68116"
       lng="139.764992"
       zoom="16"
@@ -236,7 +236,7 @@ export const ChangeProps = () => {
 
       <GeoloniaMap
         className="geolonia"
-        mapStyle="geolonia/basic"
+        mapStyle="geolonia/basic-v1"
         lat="35.68116"
         lng="139.764992"
         zoom="16"
@@ -253,7 +253,7 @@ export const WithinComponent = () => {
         <h3>Hello, map {idx}!</h3>
         <GeoloniaMap
           className="geolonia"
-          mapStyle="geolonia/basic"
+          mapStyle="geolonia/basic-v1"
           lat="35.68116"
           lng="139.764992"
           zoom="16"

@@ -45,7 +45,7 @@ Embed API は `data-*` アトリビュートで引数を渡していますが、
 
 | Embed API の属性 | Embed React の props 名 |
 | --------------- | ----------------------- |
-| `data-style="geolonia/basic"` | `mapStyle="geolonia/basic"` |
+| `data-style="geolonia/basic-v1"` | `mapStyle="geolonia/basic-v1"` |
 | `data-3d="on"`  | `render3d="on"` |
 
 `embed-react` は使用するコンポーネントがマウントされる時に Embed API の JavaScript が読み込まれているかを確認し、読み込まれていない場合は動的に追加します。もしサイトのほとんどのページに Geolonia Maps 地図を埋め込む場合は、テンプレートの `index.html` に埋め込むことをおすすめします。[サンプルを確認する](https://github.com/geolonia/maps.geolonia.com/blob/4e431e466db71af7b4181129b3a8408ae91cd028/public/index.html#L26)
