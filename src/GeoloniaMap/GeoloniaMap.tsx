@@ -96,31 +96,43 @@ const findEmbedScriptTag = () => {
   return elem;
 };
 
-const ensureGeoloniaEmbed: (
-  cb: () => void, apiKey?: string, embedSrc?: string
-) => (false | (typeof window.geolonia))
-  =
-(cb, apiKey, embedSrc) => {
+const ensureGeoloniaEmbed = async (
+  apiKey?: string, embedSrc?: string
+): Promise<typeof window.geolonia> => new Promise((resolve) => {
   // If geolonia is already loaded, then just return that now.
-  if ('geolonia' in window) return window.geolonia;
+  if ('geolonia' in window) {
+    resolve(window.geolonia as Geolonia);
+    return;
+  }
 
   // If we can find the embed script tag, run the callback when it's done loading.
   const embedScriptTag = findEmbedScriptTag();
   if (embedScriptTag) {
-    embedScriptTag.addEventListener('load', () => { cb(); });
-    return false;
+    embedScriptTag.addEventListener('load', () => {
+      if ('geolonia' in window) {
+        resolve(window.geolonia as Geolonia);
+      } else {
+        throw new Error(`${embedScriptTag.src} has been loaded but window.geolonia is not defined.`);
+      }
+    });
+    return;
   }
 
   // We couldn't find the script tag, so we'll embed it ourselves.
   const newScript = document.createElement('script');
-  newScript.onload = () => { cb(); };
+  newScript.onload = () => {
+    if ('geolonia' in window) {
+      resolve(window.geolonia as Geolonia);
+    } else {
+      throw new Error(`${embedSrc} has been loaded but window.geolonia is not defined.`);
+    }
+  };
   newScript.async = true;
   newScript.defer = true;
   newScript.id = 'geolonia-embed';
   document.head.appendChild(newScript);
   newScript.src = embedSrc || DEFAULT_EMBED_SRC(apiKey);
-  return false;
-};
+});
 
 type MapMarkerPortalProps = {
   map: Map
@@ -207,7 +219,6 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
   }, [[], []]);
 
   // console.log(props.children.type === GeoloniaControl);
-  const [ reloadSwitch, setReloadSwitch ] = useState(0);
   const [ internalMap, setInternalMap ] = useState<Map | undefined>(undefined);
   const mapRef = useRef<Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -226,34 +237,35 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
   }, [props]);
 
   useLayoutEffect(() => {
-    const loaded = () => setReloadSwitch((sw) => sw + 1);
-    const geolonia = ensureGeoloniaEmbed(loaded, initialProps.apiKey, initialProps.embedSrc);
-    if (!geolonia) {
-      // Geolonia Embed API is not loaded yet, so we'll wait for it to load.
-      return;
-    }
-
-    const container = mapContainer.current;
-    const map = new geolonia.Map({
-      container,
-    });
-    mapRef.current = map;
-    setInternalMap(map);
-    initialProps.mapRef && (initialProps.mapRef.current = map);
-    initialProps.onLoad && (initialProps.onLoad(map));
-
-    let fullyLoaded = false;
-    map.on('load', () => {
-      fullyLoaded = true;
-    });
-
-    return () => {
-      if (fullyLoaded) {
-        map.remove();
+    (async () => {
+      const geolonia = await ensureGeoloniaEmbed(initialProps.apiKey, initialProps.embedSrc);
+      if (!geolonia) {
+        // Geolonia Embed API is not loaded yet, so we'll wait for it to load.
+        return;
       }
-      (container as any).geoloniaMap = undefined;
-    };
-  }, [ reloadSwitch, initialProps ]);
+
+      const container = mapContainer.current;
+      const map = new geolonia.Map({
+        container,
+      });
+      mapRef.current = map;
+      setInternalMap(map);
+      initialProps.mapRef && (initialProps.mapRef.current = map);
+      initialProps.onLoad && (initialProps.onLoad(map));
+
+      let fullyLoaded = false;
+      map.on('load', () => {
+        fullyLoaded = true;
+      });
+
+      return () => {
+        if (fullyLoaded) {
+          map.remove();
+        }
+        (container as any).geoloniaMap = undefined;
+      };
+    })();
+  }, [ initialProps ]);
 
   const currentPosRef = useRef({ lat: initialProps.lat, lng: initialProps.lng, zoom: initialProps.zoom });
   useEffect(() => {
