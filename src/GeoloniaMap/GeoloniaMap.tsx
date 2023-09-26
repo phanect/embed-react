@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from 'react';
 import ReactDOM from 'react-dom';
-import type { geolonia } from '@geolonia/embed';
+import type { geolonia, Map } from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
 import deepEqual from 'deep-equal';
 import { Control } from './Control';
@@ -53,12 +53,12 @@ type GeoloniaMapProps = {
   style?: React.CSSProperties;
 
   /** The underlying Map object that is in charge of rendering. */
-  mapRef?: React.MutableRefObject<geolonia.Map | null>;
+  mapRef?: React.MutableRefObject<Map | null>;
   /**
    * This callback is run after the Map has been instantiated. Use this callback
    * to perform custom initialization.
    */
-  onLoad?: (map: geolonia.Map) => void;
+  onLoad?: (map: Map) => void;
 
   /**
    * If you require a custom embed API, provide the URL to it here.
@@ -124,7 +124,7 @@ const ensureGeoloniaEmbed: (
 };
 
 type MapMarkerPortalProps = {
-  map: geolonia.Map
+  map: Map
   lat: number
   lng: number
 
@@ -183,7 +183,7 @@ const _filterBoundProps: (props: React.PropsWithChildren<GeoloniaMapProps>) => R
   };
 };
 
-export const GeoloniaMapContext = createContext<geolonia.Map | null>(null);
+export const GeoloniaMapContext = createContext<Map | null>(null);
 
 const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Control: typeof Control } = (rawProps) => {
   const props: React.PropsWithChildren<GeoloniaMapProps> = useMemo(() => ({
@@ -209,8 +209,8 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
 
   // console.log(props.children.type === GeoloniaControl);
   const [ reloadSwitch, setReloadSwitch ] = useState(0);
-  const [ internalMap, setInternalMap ] = useState<geolonia.Map | undefined>(undefined);
-  const mapRef = useRef<geolonia.Map | null>(null);
+  const [ internalMap, setInternalMap ] = useState<Map | undefined>(undefined);
+  const mapRef = useRef<Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const [ initialProps, setInitialProps ] = useState(props);
 
