@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from 'react';
 import ReactDOM from 'react-dom';
-import type geolonia from '@geolonia/embed';
+import type { geolonia } from '@geolonia/embed';
 import type maplibregl from 'maplibre-gl';
 import deepEqual from 'deep-equal';
 import { Control } from './Control';
