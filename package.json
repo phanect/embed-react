@@ -69,7 +69,7 @@
     "react-dom": ">=18.2.0"
   },
   "dependencies": {
-    "@geolonia/embed": "^3.1.4",
+    "@geolonia/embed": "^4.1.0",
     "deep-equal": "^2.2.0"
   }
 }
