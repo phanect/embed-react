@@ -1,7 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from 'react';
 import ReactDOM from 'react-dom';
 import type { geolonia, Map } from '@geolonia/embed';
-import type maplibregl from 'maplibre-gl';
 import deepEqual from 'deep-equal';
 import { Control } from './Control';
 
@@ -145,7 +144,7 @@ const MapMarkerPortal: React.FC<React.PropsWithChildren<MapMarkerPortalProps>> =
       .addTo(map);
 
     if (popupExists) {
-      const popup = new (window.geolonia as unknown as typeof maplibregl).Popup({ offset: [0, -25] })
+      const popup = new window.geolonia.Popup({ offset: [0, -25] })
         .setDOMContent(wrapperElement);
       marker.setPopup(popup);
       if (openPopup === 'on') {
