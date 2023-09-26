@@ -144,22 +144,23 @@ type MapMarkerPortalProps = {
 
   markerColor: string
   openPopup: string
+  geolonia: Geolonia
 }
 
 // TODO: Expose this so users can set multiple markers.
 const MapMarkerPortal: React.FC<React.PropsWithChildren<MapMarkerPortalProps>> = (props) => {
   const wrapperElement = useMemo(() => document.createElement('div'), []);
-  const { map, lat, lng, markerColor, openPopup } = props;
+  const { map, lat, lng, markerColor, openPopup, geolonia } = props;
 
   const popupExists = !!props.children;
 
   useLayoutEffect(() => {
-    const marker = new window.geolonia.Marker({ color: markerColor })
+    const marker = new geolonia.Marker({ color: markerColor })
       .setLngLat([ lng, lat ])
       .addTo(map);
 
     if (popupExists) {
-      const popup = new window.geolonia.Popup({ offset: [0, -25] })
+      const popup = new geolonia.Popup({ offset: [0, -25] })
         .setDOMContent(wrapperElement);
       marker.setPopup(popup);
       if (openPopup === 'on') {
@@ -170,7 +171,7 @@ const MapMarkerPortal: React.FC<React.PropsWithChildren<MapMarkerPortalProps>> =
     return () => {
       marker.remove();
     };
-  }, [lat, lng, map, markerColor, openPopup, popupExists, wrapperElement]);
+  }, [geolonia.Marker, geolonia.Popup, lat, lng, map, markerColor, openPopup, popupExists, wrapperElement]);
 
   if (popupExists) {
     return ReactDOM.createPortal(
@@ -223,6 +224,7 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
 
   // console.log(props.children.type === GeoloniaControl);
   const [ internalMap, setInternalMap ] = useState<Map | undefined>(undefined);
+  const [ geolonia, setGeolonia ] = useState<Geolonia | undefined>(undefined);
   const mapRef = useRef<Map | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const [ initialProps, setInitialProps ] = useState(props);
@@ -242,6 +244,8 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
   useLayoutEffect(() => {
     (async () => {
       const geolonia = await ensureGeoloniaEmbed(initialProps.apiKey, initialProps.embedSrc);
+      setGeolonia(geolonia);
+
       if (!geolonia) {
         // Geolonia Embed API is not loaded yet, so we'll wait for it to load.
         return;
@@ -336,6 +340,7 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
         lng={parseFloat(props.lng)}
         markerColor={props.markerColor}
         openPopup={props.openPopup}
+        geolonia={geolonia}
       >
         {commonNodes}
       </MapMarkerPortal>
