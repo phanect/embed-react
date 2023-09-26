@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from 'react';
 import ReactDOM from 'react-dom';
-import type { geolonia, Map } from '@geolonia/embed';
+import { geolonia as defaultGeolonia, type Geolonia, type Map } from '@geolonia/embed';
 import deepEqual from 'deep-equal';
 import { Control } from './Control';
 
@@ -74,9 +74,6 @@ type GeoloniaMapProps = {
 } & EmbedAttributes;
 
 const DEFAULT_API_KEY = 'YOUR-API-KEY';
-const DEFAULT_EMBED_SRC = (key?: string) => (
-  `https://cdn.geolonia.com/v1/embed?geolonia-api-key=${key || DEFAULT_API_KEY}`
-);
 
 const findEmbedScriptTag = () => {
   let elem: HTMLScriptElement | undefined = document.querySelector('script#geolonia-embed');
@@ -98,7 +95,7 @@ const findEmbedScriptTag = () => {
 
 const ensureGeoloniaEmbed = async (
   apiKey?: string, embedSrc?: string
-): Promise<typeof window.geolonia> => new Promise((resolve) => {
+): Promise<Geolonia> => new Promise((resolve) => {
   // If geolonia is already loaded, then just return that now.
   if ('geolonia' in window) {
     resolve(window.geolonia as Geolonia);
@@ -118,20 +115,26 @@ const ensureGeoloniaEmbed = async (
     return;
   }
 
-  // We couldn't find the script tag, so we'll embed it ourselves.
-  const newScript = document.createElement('script');
-  newScript.onload = () => {
-    if ('geolonia' in window) {
-      resolve(window.geolonia as Geolonia);
-    } else {
-      throw new Error(`${embedSrc} has been loaded but window.geolonia is not defined.`);
-    }
-  };
-  newScript.async = true;
-  newScript.defer = true;
-  newScript.id = 'geolonia-embed';
-  document.head.appendChild(newScript);
-  newScript.src = embedSrc || DEFAULT_EMBED_SRC(apiKey);
+  // If embedSrc is set, load it and return geolonia object from it.
+  if (embedSrc) {
+    const newScript = document.createElement('script');
+    newScript.onload = () => {
+      if ('geolonia' in window) {
+        resolve(window.geolonia as Geolonia);
+      } else {
+        throw new Error(`${embedSrc} has been loaded but window.geolonia is not defined.`);
+      }
+    };
+    newScript.async = true;
+    newScript.defer = true;
+    newScript.id = 'geolonia-embed';
+    newScript.src = embedSrc;
+    document.head.appendChild(newScript);
+    return;
+  }
+
+  defaultGeolonia.setApiKey(apiKey ?? DEFAULT_API_KEY);
+  resolve(defaultGeolonia);
 });
 
 type MapMarkerPortalProps = {
