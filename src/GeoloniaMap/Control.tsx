@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect, useContext } from 'react';
 import ReactDOM from 'react-dom';
-import type { IControl } from 'maplibre-gl';
-import type geolonia from '@geolonia/embed';
+import type maplibregl from 'maplibre-gl';
 import { GeoloniaMapContext } from './GeoloniaMap';
 
 type Props = {
@@ -9,10 +8,10 @@ type Props = {
   position?: 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left';
 
   /** fire before the control added to map */
-  onAdd?: IControl['onAdd'];
+  onAdd?: maplibregl.IControl['onAdd'];
 
   /** fire after the control removeed to map */
-  onRemove?: IControl['onRemove'];
+  onRemove?: maplibregl.IControl['onRemove'];
 
   /** Picked HTMLDivElement attributes for container element of the control */
   containerProps?: {
@@ -24,7 +23,7 @@ type Props = {
   };
 }
 
-interface IPortalControl extends IControl {
+interface IPortalControl extends maplibregl.IControl {
   portal: React.ReactPortal;
 }
 
@@ -45,12 +44,12 @@ export const Control: React.FC<React.PropsWithChildren<Props>> = (props) => {
   }, [containerProps?.className, controlContainer]);
 
   useEffect(() => {
-    const PortalControl = class implements IControl {
+    const PortalControl = class implements maplibregl.IControl {
       public portal: React.ReactPortal;
-      onAdd(map: geolonia.Map) {
+      onAdd(map: maplibregl.Map) {
         return onAdd ? onAdd(map) : controlContainer;
       }
-      onRemove(map: geolonia.Map) {
+      onRemove(map: maplibregl.Map) {
         onRemove && onRemove(map);
       }
     };
