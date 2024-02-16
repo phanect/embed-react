@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, createContext } from 'react';
 import ReactDOM from 'react-dom';
-import { geolonia as defaultGeolonia, type Geolonia, type Map } from '@geolonia/embed';
+import { geolonia as defaultGeolonia, Map, type Geolonia } from '@geolonia/embed';
 import deepEqual from 'deep-equal';
 import { Control } from './Control';
 
@@ -241,6 +241,8 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
     });
   }, [props]);
 
+  const currentStyleRef = useRef<string | undefined>(props.mapStyle);
+
   useLayoutEffect(() => {
     (async () => {
       const geolonia = await ensureGeoloniaEmbed(initialProps.apiKey, initialProps.embedSrc);
@@ -255,6 +257,12 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
       const map = new geolonia.Map({
         container,
       });
+
+      if (map) {
+        map.setStyle(props.mapStyle);
+        currentStyleRef.current = props.mapStyle;
+      }
+
       mapRef.current = map;
       setInternalMap(map);
       initialProps.mapRef && (initialProps.mapRef.current = map);
@@ -272,7 +280,7 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
         (container as any).geoloniaMap = undefined;
       };
     })();
-  }, [ initialProps ]);
+  }, [ initialProps, props.mapStyle ]);
 
   const currentPosRef = useRef({ lat: initialProps.lat, lng: initialProps.lng, zoom: initialProps.zoom });
   useEffect(() => {
@@ -299,16 +307,6 @@ const GeoloniaMap: React.FC< React.PropsWithChildren<GeoloniaMapProps>> & { Cont
       zoom: props.zoom,
     };
   }, [props.lat, props.lng, props.zoom]);
-
-  const currentStyleRef = useRef<string | undefined>(props.mapStyle);
-  useEffect(() => {
-    if (props.mapStyle === currentStyleRef.current) return;
-
-    if (mapRef.current) {
-      mapRef.current.setStyle(props.mapStyle);
-      currentStyleRef.current = props.mapStyle;
-    }
-  }, [props.mapStyle]);
 
   const passthroughAttributes = {
     ...initialProps,
