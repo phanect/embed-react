@@ -4,6 +4,9 @@ module.exports = {
     browser: true,
     jest: true
   },
+  parserOptions: {
+    project: './tsconfig.eslint.json',
+  },
   rules: {
     'import/no-extraneous-dependencies': ['error', {
       'devDependencies': ['**/*.stories.tsx', '**/*.test.tsx', '*.config.js']
